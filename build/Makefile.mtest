@@ -1,0 +1,119 @@
+
+SPEED = quick
+
+.speed.quick = $(foreach s,$(sort $(filter-out %-slow %-thorough, $1)), --suite $s)
+.speed.slow = $(foreach s,$(sort $(filter-out %-thorough, $1)), --suite $s)
+.speed.thorough = $(foreach s,$(sort $1), --suite $s)
+
+.mtestargs = --no-rebuild -t 0
+ifneq ($(SPEED), quick)
+.mtestargs += --setup $(SPEED)
+endif
+.mtestargs += $(subst -j,--num-processes , $(filter-out -j, $(lastword -j1 $(filter -j%, $(MAKEFLAGS)))))
+
+.check.mtestargs = $(MTESTARGS) $(.mtestargs) $(if $(V),--verbose,--print-errorlogs)
+.bench.mtestargs = $(MTESTARGS) $(.mtestargs) --benchmark --verbose
+
+all-check-targets = check-qtest check-qtest-aarch64 check-qtest-microblazeel check-unit check-decodetree check-qapi-schema check-qapi-frontend
+all-check-xml = check-report-qtest.junit.xml check-report-qtest-aarch64.junit.xml check-report-qtest-microblazeel.junit.xml check-report-unit.junit.xml check-report-decodetree.junit.xml check-report-qapi-schema.junit.xml check-report-qapi-frontend.junit.xml
+.PHONY: check do-meson-check check-report.junit.xml $(all-check-targets) $(all-check-xml)
+ifeq ($(filter check, $(MAKECMDGOALS)),)
+.check.mtestargs += $(call .speed.$(SPEED), $(.check.mtest-suites))
+endif
+check-build: run-ninja
+check $(all-check-targets): do-meson-check
+do-meson-check: run-ninja; $(if $(MAKE.n),,+)$(MESON) test $(.check.mtestargs)
+check-report.junit.xml $(all-check-xml): check-report%.junit.xml: run-ninja
+	$(MAKE) check$* MTESTARGS="$(MTESTARGS) --logbase check-report$*" && ln -f meson-logs/$@ .
+
+.check-qtest.deps = tests/qtest/cdrom-test.exe tests/qtest/bios-tables-test.exe tests/qtest/qom-test.exe pc-bios/edk2-i386-code.fd pc-bios/edk2-arm-code.fd tests/qtest/device-introspect-test.exe tests/qtest/xlnx-canfd-test.exe tests/qtest/qos-test.exe tests/qtest/qmp-cmd-test.exe tests/qtest/bcm2835-dma-test.exe tests/qtest/numa-test.exe qemu-img.exe pc-bios/edk2-aarch64-code.fd qemu-system-microblazeel.exe tests/qtest/arm-cpu-features.exe pc-bios/edk2-x86_64-secure-code.fd tests/qtest/machine-none-test.exe pc-bios/edk2-i386-secure-code.fd tests/qtest/test-hmp.exe tests/qtest/migration-test.exe tests/qtest/netdev-socket.exe qemu-system-aarch64.exe pc-bios/edk2-x86_64-code.fd pc-bios/edk2-i386-vars.fd tests/qtest/readconfig-test.exe tests/qtest/fuzz-xlnx-dp-test.exe pc-bios/edk2-arm-vars.fd tests/qtest/xlnx-can-test.exe tests/qtest/qmp-test.exe tests/qtest/boot-serial-test.exe tests/qtest/test-netfilter.exe
+.ninja-goals.check-qtest += $(.check-qtest.deps)
+.ninja-goals.check-report-qtest.junit.xml += $(.check-qtest.deps)
+.ninja-goals.check += $(.check-qtest.deps)
+.ninja-goals.check-report.junit.xml += $(.check-qtest.deps)
+.ninja-goals.check-build += $(.check-qtest.deps)
+ifneq ($(filter check-qtest check-report-qtest.junit.xml check check-report.junit.xml, $(MAKECMDGOALS)),)
+.check.mtest-suites += qtest
+endif
+
+.check-qtest-aarch64.deps = tests/qtest/cdrom-test.exe tests/qtest/bios-tables-test.exe tests/qtest/qom-test.exe pc-bios/edk2-i386-code.fd pc-bios/edk2-arm-code.fd tests/qtest/device-introspect-test.exe tests/qtest/xlnx-canfd-test.exe tests/qtest/qos-test.exe tests/qtest/qmp-cmd-test.exe tests/qtest/bcm2835-dma-test.exe tests/qtest/numa-test.exe qemu-img.exe pc-bios/edk2-aarch64-code.fd tests/qtest/arm-cpu-features.exe pc-bios/edk2-x86_64-secure-code.fd tests/qtest/machine-none-test.exe pc-bios/edk2-i386-secure-code.fd tests/qtest/test-hmp.exe tests/qtest/migration-test.exe tests/qtest/netdev-socket.exe qemu-system-aarch64.exe pc-bios/edk2-x86_64-code.fd pc-bios/edk2-i386-vars.fd tests/qtest/readconfig-test.exe tests/qtest/fuzz-xlnx-dp-test.exe pc-bios/edk2-arm-vars.fd tests/qtest/xlnx-can-test.exe tests/qtest/qmp-test.exe tests/qtest/boot-serial-test.exe
+.ninja-goals.check-qtest-aarch64 += $(.check-qtest-aarch64.deps)
+.ninja-goals.check-report-qtest-aarch64.junit.xml += $(.check-qtest-aarch64.deps)
+.ninja-goals.check += $(.check-qtest-aarch64.deps)
+.ninja-goals.check-report.junit.xml += $(.check-qtest-aarch64.deps)
+.ninja-goals.check-build += $(.check-qtest-aarch64.deps)
+ifneq ($(filter check-qtest-aarch64 check-report-qtest-aarch64.junit.xml check check-report.junit.xml, $(MAKECMDGOALS)),)
+.check.mtest-suites += qtest-aarch64
+endif
+
+.check-qtest-microblazeel.deps = tests/qtest/cdrom-test.exe tests/qtest/qom-test.exe pc-bios/edk2-i386-code.fd pc-bios/edk2-arm-code.fd tests/qtest/device-introspect-test.exe tests/qtest/qos-test.exe tests/qtest/qmp-cmd-test.exe qemu-img.exe pc-bios/edk2-aarch64-code.fd qemu-system-microblazeel.exe pc-bios/edk2-x86_64-secure-code.fd tests/qtest/machine-none-test.exe pc-bios/edk2-i386-secure-code.fd tests/qtest/test-hmp.exe tests/qtest/netdev-socket.exe pc-bios/edk2-x86_64-code.fd pc-bios/edk2-i386-vars.fd tests/qtest/readconfig-test.exe pc-bios/edk2-arm-vars.fd tests/qtest/qmp-test.exe tests/qtest/boot-serial-test.exe tests/qtest/test-netfilter.exe
+.ninja-goals.check-qtest-microblazeel += $(.check-qtest-microblazeel.deps)
+.ninja-goals.check-report-qtest-microblazeel.junit.xml += $(.check-qtest-microblazeel.deps)
+.ninja-goals.check += $(.check-qtest-microblazeel.deps)
+.ninja-goals.check-report.junit.xml += $(.check-qtest-microblazeel.deps)
+.ninja-goals.check-build += $(.check-qtest-microblazeel.deps)
+ifneq ($(filter check-qtest-microblazeel check-report-qtest-microblazeel.junit.xml check check-report.junit.xml, $(MAKECMDGOALS)),)
+.check.mtest-suites += qtest-microblazeel
+endif
+
+.check-unit.deps = tests/unit/test-rcu-tailq.exe tests/unit/test-qtree.exe tests/unit/test-aio.exe tests/unit/test-mul64.exe tests/unit/test-qdev-global-props.exe tests/unit/test-hbitmap.exe tests/unit/test-bdrv-drain.exe tests/unit/test-qht.exe tests/unit/check-qom-interface.exe tests/unit/test-block-backend.exe tests/unit/check-qlist.exe tests/unit/test-qdist.exe tests/unit/test-authz-simple.exe tests/unit/test-cutils.exe tests/unit/test-iov.exe tests/unit/test-crypto-cipher.exe tests/unit/test-uuid.exe tests/unit/test-io-channel-null.exe tests/unit/test-qobject-input-visitor.exe tests/unit/test-x86-cpuid.exe tests/unit/test-qapi-util.exe tests/unit/test-io-channel-file.exe tests/unit/test-bufferiszero.exe tests/unit/test-rcu-slist.exe tests/unit/test-io-channel-command.exe tests/unit/test-coroutine.exe tests/unit/check-qobject.exe tests/unit/check-qom-proplist.exe tests/unit/test-qobject-output-visitor.exe tests/unit/test-shift128.exe tests/unit/test-authz-list.exe tests/unit/test-rcu-list.exe tests/unit/test-int128.exe tests/unit/check-qjson.exe tests/unit/test-crypto-hmac.exe tests/unit/test-write-threshold.exe tests/unit/test-crypto-ivgen.exe tests/unit/check-qnull.exe tests/unit/test-block-iothread.exe tests/unit/test-div128.exe tests/unit/test-visitor-serialization.exe tests/unit/test-thread-pool.exe tests/unit/check-qdict.exe tests/unit/check-qnum.exe tests/unit/test-bitcnt.exe tests/unit/test-qmp-cmds.exe tests/unit/test-bitops.exe tests/unit/test-error-report.exe tests/unit/test-logging.exe tests/unit/test-crypto-afsplit.exe tests/unit/test-crypto-akcipher.exe tests/unit/test-xs-node.exe tests/unit/test-blockjob-txn.exe tests/unit/test-rcu-simpleq.exe tests/unit/test-interval-tree.exe tests/unit/test-timed-average.exe tests/unit/test-crypto-block.exe tests/unit/test-io-task.exe tests/unit/test-crypto-der.exe tests/unit/test-keyval.exe tests/unit/check-block-qdict.exe tests/unit/test-base64.exe tests/unit/test-qgraph.exe tests/unit/test-io-channel-socket.exe tests/unit/test-clone-visitor.exe tests/unit/test-crypto-hash.exe tests/unit/test-crypto-secret.exe tests/unit/test-bdrv-graph-mod.exe tests/unit/test-xbzrle.exe tests/unit/test-aio-multithread.exe tests/unit/test-crypto-pbkdf.exe tests/unit/rcutorture.exe tests/unit/test-opts-visitor.exe tests/unit/test-yank.exe tests/unit/test-string-output-visitor.exe tests/unit/test-bitmap.exe tests/unit/test-qmp-event.exe tests/unit/test-vmstate.exe tests/unit/check-qlit.exe tests/unit/test-replication.exe tests/unit/check-qstring.exe tests/unit/test-smp-parse.exe tests/unit/test-qemu-opts.exe tests/unit/test-util-sockets.exe tests/unit/ptimer-test.exe tests/unit/test-blockjob.exe tests/unit/test-throttle.exe tests/unit/test-string-input-visitor.exe tests/unit/test-authz-listfile.exe tests/unit/test-forward-visitor.exe tests/unit/test-io-channel-buffer.exe
+.ninja-goals.check-unit += $(.check-unit.deps)
+.ninja-goals.check-report-unit.junit.xml += $(.check-unit.deps)
+.ninja-goals.check += $(.check-unit.deps)
+.ninja-goals.check-report.junit.xml += $(.check-unit.deps)
+.ninja-goals.check-build += $(.check-unit.deps)
+ifneq ($(filter check-unit check-report-unit.junit.xml check check-report.junit.xml, $(MAKECMDGOALS)),)
+.check.mtest-suites += unit
+endif
+
+.check-decodetree.deps = 
+.ninja-goals.check-decodetree += $(.check-decodetree.deps)
+.ninja-goals.check-report-decodetree.junit.xml += $(.check-decodetree.deps)
+.ninja-goals.check += $(.check-decodetree.deps)
+.ninja-goals.check-report.junit.xml += $(.check-decodetree.deps)
+.ninja-goals.check-build += $(.check-decodetree.deps)
+ifneq ($(filter check-decodetree check-report-decodetree.junit.xml check check-report.junit.xml, $(MAKECMDGOALS)),)
+.check.mtest-suites += decodetree
+endif
+
+.check-qapi-schema.deps = 
+.ninja-goals.check-qapi-schema += $(.check-qapi-schema.deps)
+.ninja-goals.check-report-qapi-schema.junit.xml += $(.check-qapi-schema.deps)
+.ninja-goals.check += $(.check-qapi-schema.deps)
+.ninja-goals.check-report.junit.xml += $(.check-qapi-schema.deps)
+.ninja-goals.check-build += $(.check-qapi-schema.deps)
+ifneq ($(filter check-qapi-schema check-report-qapi-schema.junit.xml check check-report.junit.xml, $(MAKECMDGOALS)),)
+.check.mtest-suites += qapi-schema
+endif
+
+.check-qapi-frontend.deps = 
+.ninja-goals.check-qapi-frontend += $(.check-qapi-frontend.deps)
+.ninja-goals.check-report-qapi-frontend.junit.xml += $(.check-qapi-frontend.deps)
+.ninja-goals.check += $(.check-qapi-frontend.deps)
+.ninja-goals.check-report.junit.xml += $(.check-qapi-frontend.deps)
+.ninja-goals.check-build += $(.check-qapi-frontend.deps)
+ifneq ($(filter check-qapi-frontend check-report-qapi-frontend.junit.xml check check-report.junit.xml, $(MAKECMDGOALS)),)
+.check.mtest-suites += qapi-frontend
+endif
+
+all-bench-targets = bench-speed
+all-bench-xml = bench-report-speed.junit.xml
+.PHONY: bench do-meson-bench bench-report.junit.xml $(all-bench-targets) $(all-bench-xml)
+ifeq ($(filter bench, $(MAKECMDGOALS)),)
+.bench.mtestargs += $(call .speed.$(SPEED), $(.bench.mtest-suites))
+endif
+bench-build: run-ninja
+bench $(all-bench-targets): do-meson-bench
+do-meson-bench: run-ninja; $(if $(MAKE.n),,+)$(MESON) test $(.bench.mtestargs)
+bench-report.junit.xml $(all-bench-xml): bench-report%.junit.xml: run-ninja
+	$(MAKE) bench$* MTESTARGS="$(MTESTARGS) --logbase bench-report$*" && ln -f meson-logs/$@ .
+
+.bench-speed.deps = tests/bench/benchmark-crypto-hmac.exe tests/bench/benchmark-crypto-hash.exe tests/bench/benchmark-crypto-cipher.exe tests/bench/benchmark-crypto-akcipher.exe
+.ninja-goals.bench-speed += $(.bench-speed.deps)
+.ninja-goals.bench-report-speed.junit.xml += $(.bench-speed.deps)
+.ninja-goals.bench += $(.bench-speed.deps)
+.ninja-goals.bench-report.junit.xml += $(.bench-speed.deps)
+.ninja-goals.bench-build += $(.bench-speed.deps)
+ifneq ($(filter bench-speed bench-report-speed.junit.xml bench bench-report.junit.xml, $(MAKECMDGOALS)),)
+.bench.mtest-suites += speed
+endif

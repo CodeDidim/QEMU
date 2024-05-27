@@ -1,0 +1,1 @@
+{"version": "8.1.0", "descriptive_name": "qemu", "subproject_dir": "subprojects", "subprojects": [{"name": "dtc", "version": "1.6.0", "descriptive_name": "dtc"}, {"name": "keycodemapdb", "version": "undefined", "descriptive_name": "keycodemapdb"}]}

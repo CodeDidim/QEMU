@@ -1,0 +1,1 @@
+/c/qemu/build/po/fr_FR/LC_MESSAGES/qemu.mo

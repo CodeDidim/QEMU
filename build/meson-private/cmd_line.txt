@@ -1,0 +1,14 @@
+[options]
+fdt = enabled
+xen = disabled
+gcrypt = enabled
+bindir = 
+b_pie = false
+werror = true
+docs = disabled
+qemu_suffix = 
+prefix = C:/msys64/qemu
+
+[properties]
+native_file = ['C:/qemu/build/config-meson.cross']
+

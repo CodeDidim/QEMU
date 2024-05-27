@@ -1,0 +1,44 @@
+# QEMU configure log Tue May 28 00:57:46 +04 2024
+# Configured with: '../configure' '--target-list=aarch64-softmmu,microblazeel-softmmu' '--enable-fdt' '-disable-kvm' '--disable-xen' '--enable-gcrypt'
+
+#
+
+funcs: do_compiler do_cc compile_object check_define main
+lines: 127 132 339 348 0
+cc -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
+config-temp/qemu-conf.c:2:2: error: #error __linux__ not defined
+    2 | #error __linux__ not defined
+      |  ^~~~~
+
+funcs: do_compiler do_cc compile_object check_define main
+lines: 127 132 339 350 0
+cc -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
+
+funcs: do_compiler do_cc compile_object check_define main
+lines: 127 132 339 421 0
+cc -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
+config-temp/qemu-conf.c:2:2: error: #error __i386__ not defined
+    2 | #error __i386__ not defined
+      |  ^~~~~
+
+funcs: do_compiler do_cc compile_object check_define main
+lines: 127 132 339 423 0
+cc -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
+
+funcs: do_compiler do_cc compile_object check_define main
+lines: 127 132 339 424 0
+cc -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
+config-temp/qemu-conf.c:2:2: error: #error __ILP32__ not defined
+    2 | #error __ILP32__ not defined
+      |  ^~~~~
+
+funcs: do_compiler do_cc compile_prog main
+lines: 127 138 1186 0
+cc -m64 -mcx16 -o config-temp/qemu-conf.exe config-temp/qemu-conf.c
+config-temp/qemu-conf.c:2:3: error: #error LITTLE
+    2 | # error LITTLE
+      |   ^~~~~
+
+funcs: do_compiler do_cc compile_object main
+lines: 127 132 1228 0
+cc -m64 -mcx16 -Werror -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
