@@ -1,21 +1,22 @@
-param (
-    [string]$projectName = "CanBusApp",
-    [string]$outputDir = "C:\dev\projects\CANSim"
-)
+#!/bin/bash
+
+# Parameters
+projectName="CanBusApp"
+outputDir="$HOME/dev/projects/CANSim"
 
 # Define paths
-$projectDir = Join-Path -Path $outputDir -ChildPath $projectName
-$srcDir = Join-Path -Path $projectDir -ChildPath "src"
-$propertiesDir = Join-Path -Path $srcDir -ChildPath "Properties"
+projectDir="$outputDir/$projectName"
+srcDir="$projectDir/src"
+propertiesDir="$srcDir/Properties"
 
 # Create directory structure
-New-Item -ItemType Directory -Path $projectDir -Force
-New-Item -ItemType Directory -Path $srcDir -Force
-New-Item -ItemType Directory -Path $propertiesDir -Force
+mkdir -p "$projectDir"
+mkdir -p "$srcDir"
+mkdir -p "$propertiesDir"
 
 # Create .csproj file
-$csprojContent = @"
-<Project Sdk=""Microsoft.NET.Sdk.WindowsDesktop"">
+csprojContent='<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net5.0-windows</TargetFramework>
@@ -23,22 +24,19 @@ $csprojContent = @"
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include=""System"" />
-    <Reference Include=""System.Data"" />
-    <Reference Include=""System.Drawing"" />
-    <Reference Include=""System.Windows.Forms"" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
-</Project>
-"@
-$csprojPath = Join-Path -Path $srcDir -ChildPath "$projectName.csproj"
-Set-Content -Path $csprojPath -Value $csprojContent
+</Project>'
+echo "$csprojContent" > "$srcDir/$projectName.csproj"
 
 # Create Program.cs
-$programCsContent = @"
-using System;
+programCsContent='using System;
 using System.Windows.Forms;
 
-namespace $projectName
+namespace '"$projectName"'
 {
     static class Program
     {
@@ -51,14 +49,11 @@ namespace $projectName
             Application.Run(new Form1());
         }
     }
-}
-"@
-$programCsPath = Join-Path -Path $srcDir -ChildPath "Program.cs"
-Set-Content -Path $programCsPath -Value $programCsContent
+}'
+echo "$programCsContent" > "$srcDir/Program.cs"
 
 # Create Form1.Designer.cs
-$form1DesignerCsContent = @"
-namespace $projectName
+form1DesignerCsContent='namespace '"$projectName"'
 {
     partial class Form1
     {
@@ -93,9 +88,9 @@ namespace $projectName
             this.SuspendLayout();
 
             // lblTitle
-            this.lblTitle.Font = new System.Drawing.Font(""Segoe UI"", 14F, System.Drawing.FontStyle.Bold);
+            this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
             this.lblTitle.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblTitle.Text = ""CAN Bus Communication"";
+            this.lblTitle.Text = "CAN Bus Communication";
             this.lblTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 
             // mainLayout
@@ -120,7 +115,7 @@ namespace $projectName
             this.mainLayout.SetColumnSpan(this.statusGroup, 2);
             this.mainLayout.Dock = System.Windows.Forms.DockStyle.Fill;
             this.mainLayout.Location = new System.Drawing.Point(0, 0);
-            this.mainLayout.Name = ""mainLayout"";
+            this.mainLayout.Name = "mainLayout";
             this.mainLayout.RowCount = 4;
             this.mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
             this.mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
@@ -131,69 +126,69 @@ namespace $projectName
             // connectButton
             this.connectButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.connectButton.Location = new System.Drawing.Point(603, 73);
-            this.connectButton.Name = ""connectButton"";
+            this.connectButton.Name = "connectButton";
             this.connectButton.Size = new System.Drawing.Size(75, 23);
             this.connectButton.TabIndex = 0;
-            this.connectButton.Text = ""Connect"";
+            this.connectButton.Text = "Connect";
             this.connectButton.UseVisualStyleBackColor = true;
             this.connectButton.Click += new System.EventHandler(this.connectButton_Click);
 
             // txtNodeId
             this.txtNodeId.Location = new System.Drawing.Point(3, 43);
-            this.txtNodeId.Name = ""txtNodeId"";
+            this.txtNodeId.Name = "txtNodeId";
             this.txtNodeId.Size = new System.Drawing.Size(100, 20);
             this.txtNodeId.TabIndex = 1;
-            this.txtNodeId.PlaceholderText = ""Node ID"";
+            this.txtNodeId.PlaceholderText = "Node ID";
 
             // txtState
             this.txtState.Location = new System.Drawing.Point(123, 43);
-            this.txtState.Name = ""txtState"";
+            this.txtState.Name = "txtState";
             this.txtState.Size = new System.Drawing.Size(100, 20);
             this.txtState.TabIndex = 2;
-            this.txtState.PlaceholderText = ""State"";
+            this.txtState.PlaceholderText = "State";
 
             // txtSendCount
             this.txtSendCount.Location = new System.Drawing.Point(243, 43);
-            this.txtSendCount.Name = ""txtSendCount"";
+            this.txtSendCount.Name = "txtSendCount";
             this.txtSendCount.Size = new System.Drawing.Size(100, 20);
             this.txtSendCount.TabIndex = 3;
-            this.txtSendCount.PlaceholderText = ""Send Count"";
+            this.txtSendCount.PlaceholderText = "Send Count";
 
             // txtReceiveCount
             this.txtReceiveCount.Location = new System.Drawing.Point(363, 43);
-            this.txtReceiveCount.Name = ""txtReceiveCount"";
+            this.txtReceiveCount.Name = "txtReceiveCount";
             this.txtReceiveCount.Size = new System.Drawing.Size(100, 20);
             this.txtReceiveCount.TabIndex = 4;
-            this.txtReceiveCount.PlaceholderText = ""Receive Count"";
+            this.txtReceiveCount.PlaceholderText = "Receive Count";
 
             // chkContinuously
             this.chkContinuously.Location = new System.Drawing.Point(3, 73);
-            this.chkContinuously.Name = ""chkContinuously"";
+            this.chkContinuously.Name = "chkContinuously";
             this.chkContinuously.Size = new System.Drawing.Size(100, 20);
             this.chkContinuously.TabIndex = 5;
-            this.chkContinuously.Text = ""Continuously"";
+            this.chkContinuously.Text = "Continuously";
             this.chkContinuously.UseVisualStyleBackColor = true;
             this.chkContinuously.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 
             // chkAuto
             this.chkAuto.Location = new System.Drawing.Point(123, 73);
-            this.chkAuto.Name = ""chkAuto"";
+            this.chkAuto.Name = "chkAuto";
             this.chkAuto.Size = new System.Drawing.Size(50, 20);
             this.chkAuto.TabIndex = 6;
-            this.chkAuto.Text = ""Auto"";
+            this.chkAuto.Text = "Auto";
             this.chkAuto.UseVisualStyleBackColor = true;
             this.chkAuto.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 
             // commandsGroup
             this.commandsGroup.Location = new System.Drawing.Point(3, 103);
-            this.commandsGroup.Name = ""commandsGroup"";
+            this.commandsGroup.Name = "commandsGroup";
             this.commandsGroup.Size = new System.Drawing.Size(394, 344);
-            this.commandsGroup.Text = ""Commands (Send to device)"";
+            this.commandsGroup.Text = "Commands (Send to device)";
             this.commandsGroup.Padding = new System.Windows.Forms.Padding(10);
 
             // statusGroup
             this.statusGroup.Location = new System.Drawing.Point(403, 103);
-            this.statusGroup.Name = ""statusGroup"";
+            this.statusGroup.Name = "statusGroup";
             this.statusGroup.Size = new System.Drawing.Size(394, 344);
             this.statusGroup.Text = "Status (Receive from device)";
             this.statusGroup.Padding = new System.Windows.Forms.Padding(10);
@@ -217,19 +212,17 @@ namespace $projectName
         }
     }
 }
-"@
-$form1DesignerCsPath = Join-Path -Path $srcDir -ChildPath "Form1.Designer.cs"
-Set-Content -Path $form1DesignerCsPath -Value $form1DesignerCsContent
+'@
+echo "$form1DesignerCsContent" > "$srcDir/Form1.Designer.cs"
 
 # Create Form1.cs
-$form1CsContent = @"
-using System;
+form1CsContent='using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using ArcnetDriver;
 
-namespace $projectName
+namespace CanBusApp
 {
     public partial class Form1 : Form
     {
@@ -240,7 +233,7 @@ namespace $projectName
         public Form1()
         {
             InitializeComponent();
-            model = ConfigLoader.LoadConfiguration(""commands_config.json"");
+            model = ConfigLoader.LoadConfiguration("commands_config.json");
             InitializeDynamicComponents();
         }
 
@@ -320,11 +313,11 @@ namespace $projectName
 
             if (result == 0)
             {
-                MessageBox.Show(""Initialization successful."", ""Success"", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Initialization successful.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
-                MessageBox.Show($""Initialization failed with error code: {result}"", ""Error"", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Initialization failed with error code: {result}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -358,47 +351,39 @@ namespace $projectName
         public Button ConnectButton => this.connectButton;
     }
 }
-"@
-$form1CsPath = Join-Path -Path $srcDir -ChildPath "Form1.cs"
-Set-Content -Path $form1CsPath -Value $form1CsContent
+'@
+echo "$form1CsContent" > "$srcDir/Form1.cs"
 
 # Create App.config
-$appConfigContent = @"
-<?xml version=""1.0"" encoding=""utf-8"" ?>
+appConfigContent='<?xml version="1.0" encoding="utf-8" ?>
 <configuration>
   <startup> 
-    <supportedRuntime version=""v4.0"" sku="".NETFramework,Version=v4.8"" />
+    <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.8" />
   </startup>
-</configuration>
-"@
-$appConfigPath = Join-Path -Path $srcDir -ChildPath "App.config"
-Set-Content -Path $appConfigPath -Value $appConfigContent
+</configuration>'
+echo "$appConfigContent" > "$srcDir/App.config"
 
 # Create AssemblyInfo.cs
-$assemblyInfoCsContent = @"
-using System.Reflection;
+assemblyInfoCsContent='using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle(""$projectName"")]
-[assembly: AssemblyDescription("""")]
-[assembly: AssemblyConfiguration("""")]
-[assembly: AssemblyCompany("""")]
-[assembly: AssemblyProduct(""$projectName"")]
-[assembly: AssemblyCopyright(""Copyright ©  2021"")]
-[assembly: AssemblyTrademark("""")]
-[assembly: AssemblyCulture("""")]
+[assembly: AssemblyTitle("CanBusApp")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("CanBusApp")]
+[assembly: AssemblyCopyright("Copyright ©  2021")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
-[assembly: Guid(""d13b85c4-45a8-4c7b-937e-292d04b1b616"")]
-[assembly: AssemblyVersion(""1.0.0.0"")]
-[assembly: AssemblyFileVersion(""1.0.0.0"")]
-"@
-$assemblyInfoCsPath = Join-Path -Path $propertiesDir -ChildPath "AssemblyInfo.cs"
-Set-Content -Path $assemblyInfoCsPath -Value $assemblyInfoCsContent
+[assembly: Guid("d13b85c4-45a8-4c7b-937e-292d04b1b616")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]'
+echo "$assemblyInfoCsContent" > "$propertiesDir/AssemblyInfo.cs"
 
 # Create ConfigLoader.cs
-$configLoaderCsContent = @"
-using System.Collections.Generic;
+configLoaderCsContent='using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 
@@ -437,71 +422,65 @@ public static class ConfigLoader
         var json = File.ReadAllText(path);
         return JsonConvert.DeserializeObject<CanBusModel>(json);
     }
-}
-"@
-$configLoaderCsPath = Join-Path -Path $srcDir -ChildPath "ConfigLoader.cs"
-Set-Content -Path $configLoaderCsPath -Value $configLoaderCsContent
+}'
+echo "$configLoaderCsContent" > "$srcDir/ConfigLoader.cs"
 
 # Create commands_config.json
-$commandsConfigJsonContent = @"
-{
-    ""Commands"": [
+commandsConfigJsonContent='{
+    "Commands": [
         {
-            ""Label"": ""Command 1"",
-            ""Options"": [""enum 1"", ""enum 2"", ""enum 3"", ""enum 4""],
-            ""DefaultValue"": ""enum 1""
+            "Label": "Command 1",
+            "Options": ["enum 1", "enum 2", "enum 3", "enum 4"],
+            "DefaultValue": "enum 1"
         },
         {
-            ""Label"": ""Command 2"",
-            ""Options"": [""enum 1"", ""enum 2"", ""enum 3"", ""enum 4""],
-            ""DefaultValue"": ""enum 1""
+            "Label": "Command 2",
+            "Options": ["enum 1", "enum 2", "enum 3", "enum 4"],
+            "DefaultValue": "enum 1"
         },
         {
-            ""Label"": ""Command 3"",
-            ""Options"": [""enum 1"", ""enum 2"", ""enum 3"", ""enum 4""],
-            ""DefaultValue"": ""enum 1""
+            "Label": "Command 3",
+            "Options": ["enum 1", "enum 2", "enum 3", "enum 4"],
+            "DefaultValue": "enum 1"
         },
         {
-            ""Label"": ""Command 4"",
-            ""Options"": [""enum 1"", ""enum 2"", ""enum 3"", ""enum 4""],
-            ""DefaultValue"": ""enum 1""
+            "Label": "Command 4",
+            "Options": ["enum 1", "enum 2", "enum 3", "enum 4"],
+            "DefaultValue": "enum 1"
         },
         {
-            ""Label"": ""Command 5"",
-            ""Options"": [""enum 1"", ""enum 2"", ""enum 3"", ""enum 4""],
-            ""DefaultValue"": ""enum 1""
+            "Label": "Command 5",
+            "Options": ["enum 1", "enum 2", "enum 3", "enum 4"],
+            "DefaultValue": "enum 1"
         }
     ],
-    ""Statuses"": [
+    "Statuses": [
         {
-            ""Label"": ""Status 1"",
-            ""DefaultValue"": ""Initial Status 1""
+            "Label": "Status 1",
+            "DefaultValue": "Initial Status 1"
         },
         {
-            ""Label"": ""Status 2"",
-            ""DefaultValue"": ""Initial Status 2""
+            "Label": "Status 2",
+            "DefaultValue": "Initial Status 2"
         },
         {
-            ""Label"": ""Status 3"",
-            ""DefaultValue"": ""Initial Status 3""
+            "Label": "Status 3",
+            "DefaultValue": "Initial Status 3"
         },
         {
-            ""Label"": ""Status 4"",
-            ""DefaultValue"": ""Initial Status 4""
+            "Label": "Status 4",
+            "DefaultValue": "Initial Status 4"
         },
         {
-            ""Label"": ""Status 5"",
-            ""DefaultValue"": ""Initial Status 5""
+            "Label": "Status 5",
+            "DefaultValue": "Initial Status 5"
         }
     ]
-}
-"@
-$commandsConfigJsonPath = Join-Path -Path $projectDir -ChildPath "commands_config.json"
-Set-Content -Path $commandsConfigJsonPath -Value $commandsConfigJsonContent
+}'
+echo "$commandsConfigJsonContent" > "$projectDir/commands_config.json"
 
 # Create ArcX.cs for P/Invoke
-$arcXCsContent = @"
-using System;
+arcXCsContent='using System;
 using System.Runtime.InteropServices;
 
 namespace ArcnetDriver
@@ -526,7 +505,7 @@ namespace ArcnetDriver
     public struct COM20020_TRANSMIT_BUFFER
     {
         public byte byDestinationNodeID;
-        public ushort uiNumberOfBytes;
+public ushort uiNumberOfBytes;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 508)]
         public byte[] byDataBuffer;
     }
@@ -623,17 +602,15 @@ namespace ArcnetDriver
         public static extern int Com20020Exit();
     }
 }
-"@
-$arcXCsPath = Join-Path -Path $srcDir -ChildPath "ArcX.cs"
-Set-Content -Path $arcXCsPath -Value $arcXCsContent
+'@
+echo "$arcXCsContent" > "$srcDir/ArcX.cs"
 
 # Create Solution file
-$solutionContent = @"
-Microsoft Visual Studio Solution File, Format Version 12.00
+solutionContent='Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28729.10
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "$projectName", "src\$projectName.csproj", "{B2C8458E-6C2E-4E77-908A-BD1A9CC50C52}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CanBusApp", "src\CanBusApp.csproj", "{B2C8458E-6C2E-4E77-908A-BD1A9CC50C52}"
 EndProject
 Global
     GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -646,10 +623,8 @@ Global
         {B2C8458E-6C2E-4E77-908A-BD1A9CC50C52}.Release|Any CPU.ActiveCfg = Release|Any CPU
         {B2C8458E-6C2E-4E77-908A-BD1A9CC50C52}.Release|Any CPU.Build.0 = Release|Any CPU
     EndGlobalSection
-EndGlobal
-"@
-$solutionPath = Join-Path -Path $projectDir -ChildPath "$projectName.sln"
-Set-Content -Path $solutionPath -Value $solutionContent
+EndGlobal'
+echo "$solutionContent" > "$projectDir/$projectName.sln"
 
 # Final message
-Write-Host "Project structure created successfully at $projectDir"
+echo "Project structure created successfully at $projectDir"
